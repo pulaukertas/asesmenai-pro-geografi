@@ -121,7 +121,7 @@ const generatedText =
     ?.join("")
     ?.trim() ||
   "";
-
+if (!generatedText) {
       return jsonResponse({ error: "AI tidak mengembalikan teks soal. Coba lagi dengan materi yang lebih spesifik." }, 502);
     }
 
