@@ -1,0 +1,7 @@
+# Secrets and local configuration
+.env
+.env.*
+.dev.vars
+node_modules/
+.wrangler/
+.DS_Store

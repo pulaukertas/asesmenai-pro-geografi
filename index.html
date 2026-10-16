@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <title>AsesmenAI Pro | Geografi SMAN 26 Bone</title>
+  <style>
+    :root { color-scheme: light; --navy:#102a43; --blue:#1769aa; --teal:#087e8b; --ink:#243b53; --muted:#627d98; --line:#d9e2ec; --bg:#f4f7fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+    header { background:linear-gradient(120deg,#102a43,#1769aa); color:white; padding:24px max(20px,calc((100% - 1120px)/2)); }
+    .eyebrow { font-size:.76rem; text-transform:uppercase; letter-spacing:.13em; opacity:.82; font-weight:700; }
+    h1 { margin:.45rem 0; font-size:clamp(1.7rem,4vw,2.5rem); line-height:1.12; }
+    header p { margin:.6rem 0 0; max-width:720px; color:#e5f2ff; }
+    main { width:min(1120px,calc(100% - 32px)); margin:24px auto 60px; }
+    .grid { display:grid; grid-template-columns: minmax(270px, .8fr) minmax(0,1.2fr); gap:18px; align-items:start; }
+    .card { background:white; border:1px solid var(--line); border-radius:18px; padding:22px; box-shadow:0 6px 24px #102a4308; }
+    h2 { font-size:1.08rem; margin:0 0 16px; }
+    label { display:block; font-weight:700; font-size:.9rem; margin:14px 0 6px; }
+    input,select,textarea { width:100%; border:1px solid #bcccdc; border-radius:10px; padding:11px 12px; font:inherit; color:var(--ink); background:white; }
+    textarea { min-height:100px; resize:vertical; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    button { border:0; border-radius:10px; padding:12px 16px; font:inherit; font-weight:750; cursor:pointer; }
+    .primary { color:white; background:var(--blue); width:100%; margin-top:18px; }
+    .primary:disabled { opacity:.6; cursor:wait; }
+    .secondary { color:var(--blue); background:#eaf3fb; }
+    .small { font-size:.82rem; color:var(--muted); line-height:1.5; }
+    .status { border-radius:10px; padding:11px 13px; background:#eef6ff; color:#164e78; font-size:.9rem; line-height:1.5; margin-bottom:14px; }
+    .status.error { background:#fff0f0; color:#9b1c1c; }
+    .status.success { background:#e9f9f0; color:#166534; }
+    .empty { border:1px dashed #bcccdc; border-radius:14px; padding:30px 18px; text-align:center; color:var(--muted); }
+    .question { padding:16px 0; border-bottom:1px solid var(--line); }
+    .question:last-child { border-bottom:0; }
+    .question h3 { font-size:1rem; margin:0 0 10px; line-height:1.5; }
+    .option { margin:6px 0; padding:8px 10px; background:#f6f9fc; border-radius:8px; }
+    .meta { font-size:.78rem; color:var(--muted); margin-bottom:7px; }
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .hidden { display:none; }
+    footer { text-align:center; color:var(--muted); padding:22px; font-size:.82rem; }
+    @media(max-width:760px) { .grid { grid-template-columns:1fr; } .card { padding:18px; } header { padding:22px 18px; } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Platform asesmen digital • SMAN 26 Bone</div>
+  <h1>AsesmenAI Pro</h1>
+  <p>Ruang kerja guru Geografi untuk menyusun draf soal dan kisi-kisi. Ini adalah fondasi awal; fitur bank data dan mode siswa akan dibangun pada tahap berikutnya.</p>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2><span aria-hidden="true">✦</span> Generator soal Geografi</h2>
+      <div class="status" id="status" role="status">Tahap awal siap. Isi materi lalu buat draf soal. Kunci API disimpan di server, bukan di halaman ini.</div>
+      <form id="generator">
+        <label for="topic">Materi / topik</label>
+        <textarea id="topic" required placeholder="Contoh: prinsip geografi, persebaran permukiman, peta dan skala"></textarea>
+        <div class="row">
+          <div>
+            <label for="classLevel">Kelas / fase</label>
+            <select id="classLevel">
+              <option value="Kelas X / Fase E">Kelas X / Fase E</option>
+              <option value="Kelas XI / Fase F">Kelas XI / Fase F</option>
+              <option value="Kelas XII / Fase F">Kelas XII / Fase F</option>
+            </select>
+          </div>
+          <div>
+            <label for="count">Jumlah soal</label>
+            <select id="count">
+              <option>5</option><option>10</option><option>15</option><option>20</option>
+            </select>
+          </div>
+        </div>
+        <label for="level">Level kognitif</label>
+        <select id="level">
+          <option value="Campuran C1-C4">Campuran C1–C4</option>
+          <option value="C1-C2">C1–C2: mengingat dan memahami</option>
+          <option value="C3">C3: menerapkan</option>
+          <option value="C4">C4: menganalisis</option>
+          <option value="C5-C6">C5–C6: mengevaluasi dan mencipta</option>
+        </select>
+        <button class="primary" id="generateBtn" type="submit">Buat draf soal dengan AI</button>
+      </form>
+      <p class="small">Catatan: soal hasil AI merupakan draf. Guru tetap perlu memeriksa ketepatan konsep, kunci, dan kesesuaian dengan tujuan pembelajaran.</p>
+    </section>
+    <section class="card">
+      <h2>Hasil generator</h2>
+      <div id="results" class="empty">Belum ada soal. Setelah backend AI dikonfigurasi, hasil akan tampil di sini.</div>
+      <div class="toolbar hidden" id="exportTools">
+        <button class="secondary" id="downloadJson" type="button">Unduh JSON</button>
+        <button class="secondary" id="printBtn" type="button">Cetak / Simpan PDF</button>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>AsesmenAI Pro • Guru Geografi SMAN 26 Bone • Versi fondasi</footer>
+<script>
+  const form = document.getElementById('generator');
+  const statusBox = document.getElementById('status');
+  const results = document.getElementById('results');
+  const button = document.getElementById('generateBtn');
+  const exportTools = document.getElementById('exportTools');
+  let lastPack = null;
+
+  function setStatus(message, kind='') {
+    statusBox.className = 'status' + (kind ? ' ' + kind : '');
+    statusBox.textContent = message;
+  }
+  function safeText(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function renderPack(pack) {
+    lastPack = pack;
+    const qs = Array.isArray(pack.questions) ? pack.questions : [];
+    if (!qs.length) throw new Error('Respons AI tidak memuat daftar questions yang valid.');
+    results.className = '';
+    results.innerHTML = qs.map((q, i) => {
+      const options = Array.isArray(q.options) ? q.options : [];
+      return `<article class="question"><div class="meta">Soal ${i+1}${q.level ? ' • '+safeText(q.level) : ''}${q.indicator ? ' • '+safeText(q.indicator) : ''}</div><h3>${safeText(q.question || q.stem || 'Soal tanpa teks')}</h3>${options.map((o,j)=>`<div class="option">${safeText(typeof o === 'string' ? o : (o.label || o.text || o.value || ''))}</div>`).join('')}<details><summary>Kunci dan pembahasan</summary><p><strong>Kunci:</strong> ${safeText(q.answer ?? q.key ?? q.correctAnswer ?? 'Belum disediakan')}</p><p>${safeText(q.explanation ?? q.discussion ?? q.rationale ?? '')}</p></details></article>`;
+    }).join('');
+    exportTools.classList.remove('hidden');
+    setStatus(`Berhasil menerima ${qs.length} soal. Periksa setiap kunci dan pembahasan sebelum digunakan.`, 'success');
+  }
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    button.disabled = true;
+    button.textContent = 'Memproses...';
+    setStatus('Menghubungi backend AI. Mohon tunggu.');
+    try {
+      const payload = {
+        topic: document.getElementById('topic').value.trim(),
+        classLevel: document.getElementById('classLevel').value,
+        count: Number(document.getElementById('count').value),
+        cognitiveLevel: document.getElementById('level').value
+      };
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const contentType = response.headers.get('content-type') || '';
+      const raw = await response.text();
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Backend mengembalikan format non-JSON (HTTP ${response.status}, ${contentType || 'content-type tidak diketahui'}). Pastikan proyek di-deploy sebagai Cloudflare Pages dengan folder functions/. Cuplikan: ${raw.slice(0,180)}`);
+      }
+      let data;
+      try { data = JSON.parse(raw); } catch { throw new Error('Backend mengirim JSON yang tidak valid.'); }
+      if (!response.ok) throw new Error(data.error || `Permintaan gagal (HTTP ${response.status}).`);
+      if (data.error) throw new Error(data.error);
+      renderPack(data);
+    } catch (err) {
+      setStatus(err.message || 'Terjadi kesalahan saat membuat soal.', 'error');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Buat draf soal dengan AI';
+    }
+  });
+  document.getElementById('downloadJson').addEventListener('click', () => {
+    if (!lastPack) return;
+    const blob = new Blob([JSON.stringify(lastPack, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='draf-asesmen-geografi.json'; a.click();
+    URL.revokeObjectURL(url);
+  });
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
