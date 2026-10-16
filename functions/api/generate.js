@@ -73,41 +73,55 @@ Sajikan hanya JSON valid tanpa markdown dengan struktur:
 
 Ketentuan: tepat ${count} soal; setiap soal memiliki tepat lima opsi A-E; hanya satu jawaban paling tepat; distraktor masuk akal; jangan mengarang fakta lokal; gunakan konsep Geografi yang akurat; pastikan blueprint sesuai dengan soal; jangan menambahkan teks di luar JSON.`;
 
-    const model = env.GEMINI_MODEL || "gemini-2.5-flash";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(env.GEMINI_API_KEY)}`;
-    const aiResponse = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.35
-        }
-      })
-    });
+    
+const model = "gemini-3.8-flash";
 
-    const aiRaw = await aiResponse.text();
-    let aiData;
-    try {
-      aiData = JSON.parse(aiRaw);
-    } catch {
-      return jsonResponse({
-        error: `Penyedia AI mengembalikan respons non-JSON (HTTP ${aiResponse.status}). Periksa konfigurasi model dan API.`
-      }, 502);
-    }
+const aiResponse = await fetch(
+  "https://generativelanguage.googleapis.com/v1beta/interactions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": env.GEMINI_API_KEY
+    },
+    body: JSON.stringify({
+      model,
+      input: prompt,
+      store: false,
+      generation_config: {
+        temperature: 0.35
+      }
+    })
+  }
+);
 
-    if (!aiResponse.ok) {
-      const detail = aiData?.error?.message || `Penyedia AI gagal (HTTP ${aiResponse.status}).`;
-      return jsonResponse({ error: detail }, aiResponse.status >= 500 ? 502 : 400);
-    }
+const aiRaw = await aiResponse.text();
 
-    const generatedText = aiData?.candidates?.[0]?.content?.parts
-      ?.map(part => part.text || "")
-      .join("")
-      .trim();
+let aiData;
+try {
+  aiData = JSON.parse(aiRaw);
+} catch {
+  return jsonResponse({
+    error: `Respons Gemini bukan JSON valid (HTTP ${aiResponse.status}).`
+  }, 502);
+}
 
-    if (!generatedText) {
+if (!aiResponse.ok) {
+  const detail = aiData?.error?.message ||
+    `Gemini gagal (HTTP ${aiResponse.status}).`;
+
+  return jsonResponse({ error: detail }, 502);
+}
+
+const generatedText =
+  aiData?.output_text ||
+  aiData?.output
+    ?.filter(item => item.type === "text")
+    ?.map(item => item.text || "")
+    ?.join("")
+    ?.trim() ||
+  "";
+
       return jsonResponse({ error: "AI tidak mengembalikan teks soal. Coba lagi dengan materi yang lebih spesifik." }, 502);
     }
 
